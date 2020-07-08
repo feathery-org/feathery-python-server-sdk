@@ -3,12 +3,17 @@ import requests
 def fetch_and_load_settings(features: dict, sdk_key: str) -> None:
     new_settings = get_settings_json(sdk_key)
 
+    new_dict = {}
+    for item in new_settings:
+        name = item['key']
+        overrides = {override_item["user_key"]: override_item["user_value"] for override_item in item["overrides"] }
+        new_dict[name] = {"value": item['value'], "datatype": item['datatype'], "overrides": overrides }
     # TODO: Ensure atomicity?
-    features = new_settings
+    features = new_dict
 
 def get_settings_json(sdk_key: str) -> dict:
     """
-    Retrieves Configurations from unleash central server.
+    Retrieves settings from Feathery central server.
     Notes:
     * If unsuccessful (i.e. not HTTP status code 200), exception will be caught and logged.
         This is to allow "safe" error handling if unleash server goes down.

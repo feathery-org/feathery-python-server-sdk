@@ -1,23 +1,24 @@
   
 """
-The featheryclient module contains the most common top-level entry points for the SDK.
+The FeatheryClient module contains SDK public entry points.
 """
 import requests
+
 from featheryclient.constants import API_URL, REQUEST_TIMEOUT, REFRESH_INTERVAL
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
-from .utils import fetch_and_load_settings
+
+from featheryclient.utils import fetch_and_load_settings
 
 class FeatheryClient():
 
     def set_sdk_key(self, sdk_key):
-        """Sets the SDK key for the shared SDK client instance and initializes client, starting communication with 
-        central Feathery server(s).
+        """Sets the SDK key for the shared SDK client instance and initializes client.
         :param string sdk_key: the new SDK key
         """
         
         self.sdk_key = sdk_key
-        self.settings = {}  # type: Dict
+        self.settings = {}
         self.scheduler = BackgroundScheduler()
 
         self.api_url = API_URL
@@ -25,7 +26,7 @@ class FeatheryClient():
 
         fetch_and_load_settings(self.settings, self.sdk_key)
 
-        # Start periodic jobs
+        # Start periodic job
         self.scheduler.start()
         self.fl_job = self.scheduler.add_job(fetch_and_load_settings,
                                              trigger=IntervalTrigger(seconds=int(self.refresh_interval)),
@@ -37,7 +38,6 @@ class FeatheryClient():
                     setting_key,
                     default_value,
                     user_key):
-        # TODO should this return a str? If its a bool, it would be "true".
         # TODO Must handle invalid user ids and setting keys somehow
         """
         Checks the setting value for a user.  If the user and setting exist, return variant.
