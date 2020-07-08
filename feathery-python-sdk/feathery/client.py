@@ -1,48 +1,44 @@
-  
-"""
-The FeatheryClient module contains SDK public entry points.
-"""
-import requests
-
-from featheryclient.constants import API_URL, REQUEST_TIMEOUT, REFRESH_INTERVAL
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from featheryclient.utils import fetch_and_load_settings
+from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT
+from feathery.utils import fetch_and_load_settings
 
-class FeatheryClient():
 
-    def set_sdk_key(self, sdk_key):
-        """Sets the SDK key for the shared SDK client instance and initializes client.
+class FeatheryClient:
+    def __init__(self, sdk_key):
+        """Sets the SDK key and spins up an asynchronous setting polling job.
         :param string sdk_key: the new SDK key
         """
-        
+
         self.sdk_key = sdk_key
         self.settings = {}
         self.scheduler = BackgroundScheduler()
 
         self.api_url = API_URL
         self.refresh_interval = REFRESH_INTERVAL
+        self.request_timeout = REQUEST_TIMEOUT
 
         fetch_and_load_settings(self.settings, self.sdk_key)
 
         # Start periodic job
         self.scheduler.start()
-        self.fl_job = self.scheduler.add_job(fetch_and_load_settings,
-                                             trigger=IntervalTrigger(seconds=int(self.refresh_interval)),
-                                             kwargs={"features": self.settings, "sdk_key": self.sdk_key})
+        self.fl_job = self.scheduler.add_job(
+            fetch_and_load_settings,
+            trigger=IntervalTrigger(seconds=int(self.refresh_interval)),
+            kwargs={"features": self.settings, "sdk_key": self.sdk_key},
+        )
 
         self.is_initialized = True
 
-    def variation(self,
-                    setting_key,
-                    default_value,
-                    user_key):
+    def variation(self, setting_key, default_value, user_key):
         # TODO Must handle invalid user ids and setting keys somehow
         """
-        Checks the setting value for a user.  If the user and setting exist, return variant.
+        Checks the setting value for a user.  If the user and setting exist,
+        return variant.
         Notes:
-        * If client hasn't been initialized yet or an error occurs, flat will default to false.
+        * If client hasn't been initialized yet or an error occurs, flat will
+        default to false.
         :param setting_key: Name of the setting
         :param default_value: Default value for the setting.
         :param user_key: Unique key belonging to the user.
@@ -53,14 +49,15 @@ class FeatheryClient():
             try:
                 return self.settings[setting_key].overrides[user_key]
                 # TODO you are accessing an array like it is a dict.
-            except Exception as excep:
+            except Exception:
                 return default_value
         else:
             return default_value
 
     def destroy(self):
         """
-        Gracefully shuts down the Feathery client by stopping jobs, stopping the scheduler, and deleting the cache.
+        Gracefully shuts down the Feathery client by stopping jobs, stopping
+        the scheduler, and deleting the cache.
         :return:
         """
         self.fl_job.remove()

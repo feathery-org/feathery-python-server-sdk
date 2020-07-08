@@ -1,15 +1,24 @@
 import requests
 
+
 def fetch_and_load_settings(features: dict, sdk_key: str) -> None:
     new_settings = get_settings_json(sdk_key)
 
     new_dict = {}
     for item in new_settings:
-        name = item['key']
-        overrides = {override_item["user_key"]: override_item["user_value"] for override_item in item["overrides"] }
-        new_dict[name] = {"value": item['value'], "datatype": item['datatype'], "overrides": overrides }
+        name = item["key"]
+        overrides = {
+            override_item["user_key"]: override_item["user_value"]
+            for override_item in item["overrides"]
+        }
+        new_dict[name] = {
+            "value": item["value"],
+            "datatype": item["datatype"],
+            "overrides": overrides,
+        }
     # TODO: Ensure atomicity?
     features = new_dict
+
 
 def get_settings_json(sdk_key: str) -> dict:
     """
@@ -19,11 +28,9 @@ def get_settings_json(sdk_key: str) -> dict:
         This is to allow "safe" error handling if unleash server goes down.
     :return: Configurations if successful, empty dict if not.
     """
-    headers = { "Authorization": "Token " + sdk_key}
+    headers = {"Authorization": "Token " + sdk_key}
 
-    resp = requests.get(API_URL,
-                        headers={**headers},
-                        timeout=REQUEST_TIMEOUT)
+    resp = requests.get(API_URL, headers={**headers}, timeout=REQUEST_TIMEOUT)
 
     if resp.status_code != 200:
         return {}
