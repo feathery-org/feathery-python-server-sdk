@@ -1,8 +1,14 @@
 import threading
 
-from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT, POLL_FREQ_SECONDS
-from feathery.utils import fetch_and_return_settings
+from feathery.constants import (
+    API_URL,
+    REFRESH_INTERVAL,
+    REQUEST_TIMEOUT,
+    POLL_FREQ_SECONDS,
+)
 from feathery.polling import PollingThread
+from feathery.utils import fetch_and_return_settings
+
 
 class FeatheryClient:
     def __init__(self, sdk_key):
@@ -21,13 +27,17 @@ class FeatheryClient:
         self.settings = fetch_and_return_settings(self.sdk_key)
 
         # Start periodic job
-        self.scheduler = PollingThread(features=self.settings, sdk_key=self.sdk_key, interval=POLL_FREQ_SECONDS, lock=self._lock)
+        self.scheduler = PollingThread(
+            features=self.settings,
+            sdk_key=self.sdk_key,
+            interval=POLL_FREQ_SECONDS,
+            lock=self._lock,
+        )
         self.scheduler.start()
 
         self.is_initialized = True
 
     def variation(self, setting_key, default_value, user_key):
-        # TODO Must handle invalid user ids and setting keys somehow
         """
         Checks the setting value for a user.  If the user and setting exist,
         return variant.
@@ -45,16 +55,12 @@ class FeatheryClient:
         if self.is_initialized:
             self._lock.acquire()
             if setting_key in self.settings:
-                if user_key in self.settings[setting_key]['overrides']:
-                    variant = self.settings[setting_key]['overrides'][user_key]
+                if user_key in self.settings[setting_key]["overrides"]:
+                    variant = self.settings[setting_key]["overrides"][user_key]
                 else:
                     variant = self.settings[setting_key]["value"]
-            else:
-                variant = default_value
             self._lock.release()
-        else:
-            variant = default_value
-        
+
         return variant
 
     def destroy(self):

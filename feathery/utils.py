@@ -1,8 +1,9 @@
 import requests
-from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT, POLL_FREQ_SECONDS
+
+from feathery.constants import API_URL, REQUEST_TIMEOUT
 
 
-def fetch_and_return_settings(sdk_key: str) -> None:
+def fetch_and_return_settings(sdk_key: str) -> dict:
     new_settings = get_settings_json(sdk_key)
 
     new_dict = {}
@@ -17,7 +18,6 @@ def fetch_and_return_settings(sdk_key: str) -> None:
             "datatype": item["datatype"],
             "overrides": overrides,
         }
-    print(new_dict)
     return new_dict
 
 
@@ -30,11 +30,7 @@ def get_settings_json(sdk_key: str) -> dict:
     :return: Configurations if successful, empty dict if not.
     """
     headers = {"Authorization": "Token " + sdk_key}
-
     resp = requests.get(API_URL, headers={**headers}, timeout=REQUEST_TIMEOUT)
-
     if resp.status_code != 200:
         return {}
-
-    print(resp.json())
     return resp.json()
