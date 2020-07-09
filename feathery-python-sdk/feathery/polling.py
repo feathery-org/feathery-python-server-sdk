@@ -24,7 +24,7 @@ class PollingThread(Thread):
                     self.features = all_data
                     self.lock.release()
                 except Exception as e:
-
+                    # TODO what to do here? Would just log.
 
                 elapsed = time.time() - start_time
                 if elapsed < self.interval:
