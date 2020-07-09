@@ -1,1 +1,1 @@
-# feathery-python-server-sdk
+# LaunchDarkly Server-side SDK for Python
