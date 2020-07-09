@@ -1,7 +1,8 @@
 import requests
+from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT, POLL_FREQ_SECONDS
 
 
-def fetch_and_load_settings(features: dict, sdk_key: str) -> None:
+def fetch_and_return_settings(sdk_key: str) -> None:
     new_settings = get_settings_json(sdk_key)
 
     new_dict = {}
@@ -16,8 +17,7 @@ def fetch_and_load_settings(features: dict, sdk_key: str) -> None:
             "datatype": item["datatype"],
             "overrides": overrides,
         }
-    # TODO: Ensure atomicity?
-    features = new_dict
+    return new_dict
 
 
 def get_settings_json(sdk_key: str) -> dict:

@@ -1,9 +1,11 @@
+import threading
+
 from apscheduler.triggers.interval import IntervalTrigger
 from apscheduler.schedulers.background import BackgroundScheduler
 
-from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT
+from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT, POLL_FREQ_SECONDS
 from feathery.utils import fetch_and_load_settings
-
+from feathery.polling import PollingThread
 
 class FeatheryClient:
     def __init__(self, sdk_key):
@@ -18,16 +20,13 @@ class FeatheryClient:
         self.api_url = API_URL
         self.refresh_interval = REFRESH_INTERVAL
         self.request_timeout = REQUEST_TIMEOUT
+        self._lock = threading.Lock()
 
         fetch_and_load_settings(self.settings, self.sdk_key)
 
         # Start periodic job
+        self.scheduler = PollingThread(features=self.settings sdk_key=self.sdk_key interval=POLL_FREQ_SECONDS, lock=self._lock)
         self.scheduler.start()
-        self.fl_job = self.scheduler.add_job(
-            fetch_and_load_settings,
-            trigger=IntervalTrigger(seconds=int(self.refresh_interval)),
-            kwargs={"features": self.settings, "sdk_key": self.sdk_key},
-        )
 
         self.is_initialized = True
 
@@ -47,8 +46,10 @@ class FeatheryClient:
 
         if self.is_initialized:
             try:
-                return self.settings[setting_key].overrides[user_key]
-                # TODO you are accessing an array like it is a dict.
+                self._lock().aquire()
+                variant = self.settings[setting_key].overrides[user_key]
+                self._lock().release()
+                return variant
             except Exception:
                 return default_value
         else:
@@ -60,5 +61,4 @@ class FeatheryClient:
         the scheduler, and deleting the cache.
         :return:
         """
-        self.fl_job.remove()
-        self.scheduler.shutdown()
+        self.scheduler.stop()
