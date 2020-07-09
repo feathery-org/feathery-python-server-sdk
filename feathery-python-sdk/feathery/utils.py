@@ -17,6 +17,7 @@ def fetch_and_return_settings(sdk_key: str) -> None:
             "datatype": item["datatype"],
             "overrides": overrides,
         }
+    print(new_dict)
     return new_dict
 
 
@@ -35,4 +36,5 @@ def get_settings_json(sdk_key: str) -> dict:
     if resp.status_code != 200:
         return {}
 
+    print(resp.json())
     return resp.json()

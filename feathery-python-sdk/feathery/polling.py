@@ -2,9 +2,9 @@ import copy
 import threading 
 import time
 
-from feathery.utils import fetch_and_load_settings 
+from feathery.utils import fetch_and_return_settings 
 
-class PollingThread(Thread):
+class PollingThread(threading.Thread):
     def __init__(self, features, sdk_key, interval, lock):
         threading.Thread.__init__(self)
         self._running = False
@@ -19,13 +19,18 @@ class PollingThread(Thread):
             while self._running:
                 start_time = time.time()
                 try:
+                    all_data = fetch_and_return_settings(self.sdk_key)
                     self.lock.aquire()
-                    self.features = copy.deepcopy(fetch_and_load_settings(self.features, self.sdk_key))
-                    self.features = all_data
+                    self.features = copy.deepcopy(all_data)
                     self.lock.release()
-                except Exception as e:
+                except Exception:
                     # TODO what to do here? Would just log.
+                    pass
+                    
 
                 elapsed = time.time() - start_time
                 if elapsed < self.interval:
                     time.sleep(self.interval - elapsed)
+    
+    def stop(self):
+        self._running = False

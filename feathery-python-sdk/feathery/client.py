@@ -1,10 +1,7 @@
 import threading
 
-from apscheduler.triggers.interval import IntervalTrigger
-from apscheduler.schedulers.background import BackgroundScheduler
-
 from feathery.constants import API_URL, REFRESH_INTERVAL, REQUEST_TIMEOUT, POLL_FREQ_SECONDS
-from feathery.utils import fetch_and_load_settings
+from feathery.utils import fetch_and_return_settings
 from feathery.polling import PollingThread
 
 class FeatheryClient:
@@ -15,17 +12,16 @@ class FeatheryClient:
 
         self.sdk_key = sdk_key
         self.settings = {}
-        self.scheduler = BackgroundScheduler()
 
         self.api_url = API_URL
         self.refresh_interval = REFRESH_INTERVAL
         self.request_timeout = REQUEST_TIMEOUT
         self._lock = threading.Lock()
 
-        fetch_and_load_settings(self.settings, self.sdk_key)
+        self.settings = fetch_and_return_settings(self.sdk_key)
 
         # Start periodic job
-        self.scheduler = PollingThread(features=self.settings sdk_key=self.sdk_key interval=POLL_FREQ_SECONDS, lock=self._lock)
+        self.scheduler = PollingThread(features=self.settings, sdk_key=self.sdk_key, interval=POLL_FREQ_SECONDS, lock=self._lock)
         self.scheduler.start()
 
         self.is_initialized = True
@@ -44,16 +40,22 @@ class FeatheryClient:
         :return: Dict with variant and setting status.
         """
 
+        variant = default_value
+
         if self.is_initialized:
-            try:
-                self._lock().aquire()
-                variant = self.settings[setting_key].overrides[user_key]
-                self._lock().release()
-                return variant
-            except Exception:
-                return default_value
+            self._lock.acquire()
+            if setting_key in self.settings:
+                if user_key in self.settings[setting_key]['overrides']:
+                    variant = self.settings[setting_key]['overrides'][user_key]
+                else:
+                    variant = self.settings[setting_key]["value"]
+            else:
+                variant = default_value
+            self._lock.release()
         else:
-            return default_value
+            variant = default_value
+        
+        return variant
 
     def destroy(self):
         """
