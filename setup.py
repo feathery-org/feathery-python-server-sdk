@@ -1,7 +1,7 @@
 import setuptools
 
 setuptools.setup(
-    name="feathery-python-sdk", # Replace with your own username
+    name="feathery", # Replace with your own username
     version="0.0.1",
     author="Markie Wagner, Peter Dun",
     author_email="me@markiewagner.com",
