@@ -5,9 +5,6 @@ import feathery
 from testing_constants import (
     API_URL,
     MOCK_ALL_SETTINGS,
-    REQUEST_TIMEOUT,
-    REFRESH_INTERVAL,
-    POLL_FREQ_SECONDS,
     SDK,
 )
 

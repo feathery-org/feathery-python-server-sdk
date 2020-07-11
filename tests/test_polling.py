@@ -6,7 +6,6 @@ from feathery.rwlock import ReadWriteLock
 from feathery.utils import fetch_and_return_settings
 from testing_constants import (
     API_URL,
-    MOCK_ALL_SETTINGS,
     REQUEST_TIMEOUT,
     POLL_FREQ_SECONDS,
     SDK,

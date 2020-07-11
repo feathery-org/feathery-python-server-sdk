@@ -1,25 +1,3 @@
-MOCK_ALL_SETTINGS = {
-    "setting_1": {
-        "value": False,
-        "datatype": "boolean",
-        "overrides": {
-            "email1": False,
-            "0": False,
-            "email2": False,
-            "15": False,
-            "email3": False,
-            "3": False,
-            "56": False,
-        },
-    },
-    "setting2": {
-        "value": 1,
-        "datatype": "int",
-        "overrides": {"email1": 2, "email2": 3, "email3": 4},
-    },
-    "setting3": {"value": "10 4 * * *", "datatype": "string", "overrides": {}},
-    "setting4": {"value": "5 4 * * 1", "datatype": "string", "overrides": {}},
-}
 API_URL = "http://cdn.feathery.tech/external/"
 REQUEST_TIMEOUT = 1
 REFRESH_INTERVAL = 60
