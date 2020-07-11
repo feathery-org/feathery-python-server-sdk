@@ -5,7 +5,6 @@ from feathery.constants import API_URL, REQUEST_TIMEOUT
 
 def fetch_and_return_settings(sdk_key: str) -> dict:
     new_settings = get_settings_json(sdk_key)
-
     new_dict = {}
     for item in new_settings:
         name = item["key"]
@@ -31,6 +30,7 @@ def get_settings_json(sdk_key: str) -> dict:
     """
     headers = {"Authorization": "Token " + sdk_key}
     resp = requests.get(API_URL, headers={**headers}, timeout=REQUEST_TIMEOUT)
+    print(resp.json())
     if resp.status_code != 200:
         return {}
     return resp.json()

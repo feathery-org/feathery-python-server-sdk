@@ -1,8 +1,8 @@
 import setuptools
 
 setuptools.setup(
-    name="feathery-python-sdk", # Replace with your own username
-    version="0.0.2",
+    name="feathery-server-sdk", # Replace with your own username
+    version="0.0.1",
     author="Markie Wagner, Peter Dun",
     author_email="me@markiewagner.com",
     description="A Python SDK for Feathery.",

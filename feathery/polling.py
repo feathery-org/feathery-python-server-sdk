@@ -24,6 +24,7 @@ class PollingThread(threading.Thread):
             except Exception:
                 pass
             time.sleep(self.interval)
+        print('self no longer running!')
 
     def stop(self):
         self._run = False
