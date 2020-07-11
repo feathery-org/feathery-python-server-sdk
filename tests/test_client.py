@@ -22,7 +22,6 @@ def test_feathery_client_nodestroy():
     feathery.set_sdk_key(SDK)
     feathery_client = feathery.get()
     yield feathery_client
-    feathery_client.halt()
 
 
 @responses.activate

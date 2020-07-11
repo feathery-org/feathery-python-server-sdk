@@ -6,10 +6,10 @@ from feathery.rwlock import ReadWriteLock
 from feathery.utils import fetch_and_return_settings
 from testing_constants import (
     API_URL,
-    REQUEST_TIMEOUT,
     POLL_FREQ_SECONDS,
     SDK,
     MOCK_ALL_SETTINGS_PROCESSED,
+    MOCK_ALL_SETTINGS
 )
 
 
@@ -43,7 +43,6 @@ def test_polling_thread_nodestroy():
     )
     polling_thread.start()
     yield polling_thread
-    polling_thread.stop()
 
 
 @responses.activate
