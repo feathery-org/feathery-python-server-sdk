@@ -23,7 +23,7 @@ class FeatheryClient:
             interval=POLL_FREQ_SECONDS,
             lock=self.lock,
         )
-        self.scheduler.run()
+        self.scheduler.start()
 
     def variation(self, setting_key, default_value, user_key):
         """
@@ -39,7 +39,6 @@ class FeatheryClient:
         self.lock.rlock()
         if self.thread_context["is_initialized"]:
             settings = self.thread_context["settings"]
-            print(settings)
             if setting_key in settings:
                 setting = settings[setting_key]
                 if user_key in setting["overrides"]:

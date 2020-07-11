@@ -1,27 +1,30 @@
-import time
-import json
 import pytest
 import responses
-import feathery
+import time
 from feathery.polling import PollingThread
 from feathery.rwlock import ReadWriteLock
-
-from testing_constants import API_URL, MOCK_ALL_SETTINGS, REQUEST_TIMEOUT, REFRESH_INTERVAL, POLL_FREQ_SECONDS, SDK
+from feathery.utils import fetch_and_return_settings
+from testing_constants import (
+    API_URL,
+    MOCK_ALL_SETTINGS,
+    REQUEST_TIMEOUT,
+    POLL_FREQ_SECONDS,
+    SDK,
+    MOCK_ALL_SETTINGS_PROCESSED,
+)
 
 
 @pytest.fixture()
-def polling_thread(tmpdir):
+def test_polling_thread():
+    responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
     # Start periodic job
     thread_context = {
-            "settings": fetch_and_return_settings(sdk_key),
-            "is_initialized": False,
-        }
+        "settings": fetch_and_return_settings(SDK),
+        "is_initialized": False,
+    }
     lock = ReadWriteLock()
     polling_thread = PollingThread(
-        context=thread_context,
-        sdk_key=SDK,
-        interval=POLL_FREQ_SECONDS,
-        lock=lock,
+        context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
     )
     polling_thread.run()
     yield polling_thread
@@ -29,40 +32,37 @@ def polling_thread(tmpdir):
 
 
 @pytest.fixture()
-def polling_thread_nodestroy(tmpdir):
+def test_polling_thread_nodestroy():
+    responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
     thread_context = {
-            "settings": fetch_and_return_settings(sdk_key),
-            "is_initialized": False,
-        }
+        "settings": fetch_and_return_settings(SDK),
+        "is_initialized": False,
+    }
     lock = ReadWriteLock()
     polling_thread = PollingThread(
-        context=thread_context,
-        sdk_key=sdk_key,
-        interval=POLL_FREQ_SECONDS,
-        lock=self.lock,
+        context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
     )
-    polling_thread.run()
+    polling_thread.start()
     yield polling_thread
     polling_thread.stop()
 
+
 @responses.activate
-def polling_thread():
-    mocker.patch('time.sleep', side_effect=Exception('mocked error'))
+def test_polling_thread_settings(mocker):
+    responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
     thread_context = {
-            "settings": fetch_and_return_settings(sdk_key),
-            "is_initialized": False,
-        }
+        "settings": fetch_and_return_settings(SDK),
+        "is_initialized": False,
+    }
     lock = ReadWriteLock()
     polling_thread = PollingThread(
-        context=thread_context,
-        sdk_key=SDK,
-        interval=POLL_FREQ_SECONDS,
-        lock=lock,
+        context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
     )
-    try:
-        polling_thread.run()
-    finally:
-        assert polling_thread.context["settings"] = MOCK_ALL_SETTINGS
 
-    yield polling_thread
+    polling_thread.start()
+    time.sleep(1)
+    polling_thread.cv.acquire()
+    print(polling_thread.context["settings"])
+    assert polling_thread.context["settings"] == MOCK_ALL_SETTINGS_PROCESSED
+    polling_thread.cv.release()
     polling_thread.stop()

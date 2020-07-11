@@ -30,7 +30,6 @@ def get_settings_json(sdk_key: str) -> dict:
     """
     headers = {"Authorization": "Token " + sdk_key}
     resp = requests.get(API_URL, headers={**headers}, timeout=REQUEST_TIMEOUT)
-    print(resp.json())
     if resp.status_code != 200:
         return {}
     return resp.json()

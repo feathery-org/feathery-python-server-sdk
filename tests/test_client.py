@@ -1,13 +1,19 @@
 import time
-import json
 import pytest
 import responses
 import feathery
-from testing_constants import API_URL, MOCK_ALL_SETTINGS, REQUEST_TIMEOUT, REFRESH_INTERVAL, POLL_FREQ_SECONDS, SDK
+from testing_constants import (
+    API_URL,
+    MOCK_ALL_SETTINGS,
+    REQUEST_TIMEOUT,
+    REFRESH_INTERVAL,
+    POLL_FREQ_SECONDS,
+    SDK,
+)
 
 
 @pytest.fixture()
-def feathery_client(tmpdir):
+def test_feathery_client():
     feathery.set_sdk_key(SDK)
     feathery_client = feathery.get()
     yield feathery_client
@@ -15,11 +21,12 @@ def feathery_client(tmpdir):
 
 
 @pytest.fixture()
-def feathery_client_nodestroy(tmpdir):
+def test_feathery_client_nodestroy():
     feathery.set_sdk_key(SDK)
     feathery_client = feathery.get()
     yield feathery_client
     feathery_client.halt()
+
 
 @responses.activate
 def test_uc_get_variant():
@@ -45,4 +52,3 @@ def test_uc_get_variant():
     assert variant == 0
 
     feathery_client.halt()
-
