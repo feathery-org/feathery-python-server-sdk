@@ -1,12 +1,6 @@
-import threading
-
-from feathery.constants import (
-    API_URL,
-    REFRESH_INTERVAL,
-    REQUEST_TIMEOUT,
-    POLL_FREQ_SECONDS,
-)
+from feathery.constants import POLL_FREQ_SECONDS
 from feathery.polling import PollingThread
+from feathery.rwlock import ReadWriteLock
 from feathery.utils import fetch_and_return_settings
 
 
@@ -16,34 +10,24 @@ class FeatheryClient:
         :param string sdk_key: the new SDK key
         """
 
-        self.sdk_key = sdk_key
-        self.settings = {}
-
-        self.api_url = API_URL
-        self.refresh_interval = REFRESH_INTERVAL
-        self.request_timeout = REQUEST_TIMEOUT
-        self._lock = threading.Lock()
-
-        self.settings = fetch_and_return_settings(self.sdk_key)
+        self.lock = ReadWriteLock()
+        self.thread_context = {
+            "settings": fetch_and_return_settings(sdk_key),
+            "is_initialized": False,
+        }
 
         # Start periodic job
         self.scheduler = PollingThread(
-            features=self.settings,
-            sdk_key=self.sdk_key,
+            context=self.thread_context,
+            sdk_key=sdk_key,
             interval=POLL_FREQ_SECONDS,
-            lock=self._lock,
+            lock=self.lock,
         )
         self.scheduler.start()
 
-        self.is_initialized = True
-
     def variation(self, setting_key, default_value, user_key):
         """
-        Checks the setting value for a user.  If the user and setting exist,
-        return variant.
-        Notes:
-        * If client hasn't been initialized yet or an error occurs, flat will
-        default to false.
+        Return the setting value for a user.
         :param setting_key: Name of the setting
         :param default_value: Default value for the setting.
         :param user_key: Unique key belonging to the user.
@@ -52,21 +36,22 @@ class FeatheryClient:
 
         variant = default_value
 
-        if self.is_initialized:
-            self._lock.acquire()
-            if setting_key in self.settings:
-                if user_key in self.settings[setting_key]["overrides"]:
-                    variant = self.settings[setting_key]["overrides"][user_key]
+        self.lock.rlock()
+        if self.thread_context["is_initialized"]:
+            settings = self.thread_context["settings"]
+            if setting_key in settings:
+                setting = settings[setting_key]
+                if user_key in setting["overrides"]:
+                    variant = setting["overrides"][user_key]
                 else:
-                    variant = self.settings[setting_key]["value"]
-            self._lock.release()
+                    variant = setting["value"]
+        self.lock.runlock()
 
         return variant
 
-    def destroy(self):
+    def halt(self):
         """
-        Gracefully shuts down the Feathery client by stopping jobs, stopping
-        the scheduler, and deleting the cache.
+        Gracefully shuts down the Feathery client by halting the scheduler.
         :return:
         """
         self.scheduler.stop()
