@@ -34,6 +34,6 @@ def polling_thread():
 @responses.activate
 def test_polling_thread_settings(polling_thread):
     time.sleep(1)
-    polling_thread.cv.acquire()
+    polling_thread.context_lock.lock()
     assert polling_thread.context["settings"] == MOCK_ALL_SETTINGS_PROCESSED
-    polling_thread.cv.release()
+    polling_thread.context_lock.unlock()
