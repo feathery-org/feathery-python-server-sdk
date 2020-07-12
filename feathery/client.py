@@ -49,7 +49,7 @@ class FeatheryClient:
 
         return variant
 
-    def halt(self):
+    def close(self):
         """
         Gracefully shuts down the Feathery client by halting the scheduler.
         :return:

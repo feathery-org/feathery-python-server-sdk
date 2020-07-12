@@ -5,7 +5,7 @@ import time
 from feathery.polling import PollingThread
 from feathery.rwlock import ReadWriteLock
 from feathery.utils import fetch_and_return_settings
-from testing_constants import (
+from tests.constants import (
     API_URL,
     MOCK_ALL_SETTINGS,
     MOCK_ALL_SETTINGS_PROCESSED,
