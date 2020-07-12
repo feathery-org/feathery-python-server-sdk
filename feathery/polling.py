@@ -11,7 +11,7 @@ class PollingThread(threading.Thread):
         self.sdk_key = sdk_key
         self.interval = interval
         self.context_lock = lock
-        self.cv = threading.Condition(threading.Lock())
+        self.sema = threading.Semaphore(value=0)
 
     def run(self):
         while self._run:
@@ -23,13 +23,9 @@ class PollingThread(threading.Thread):
                 self.context_lock.unlock()
             except Exception:
                 pass
-            self.cv.acquire()
-            self.cv.wait(self.interval)
-            self.cv.release()
+            self.sema.acquire(timeout=self.interval)
 
     def stop(self):
         self._run = False
-        self.cv.acquire()
-        self.cv.notify_all()
-        self.cv.release()
+        self.sema.release()
         self.join()
