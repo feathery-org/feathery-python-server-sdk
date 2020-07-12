@@ -24,10 +24,6 @@ class PollingThread(threading.Thread):
             except Exception:
                 pass
             self.sema.acquire(timeout=self.interval)
-<<<<<<< HEAD
-=======
-            self.sema.release()
->>>>>>> f9f0f0cd679e650c101bfa1f8c65a668a230542e
 
     def stop(self):
         self._run = False
