@@ -43,7 +43,7 @@ def polling_thread_nodestroy():
         context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
     )
     polling_thread.start()
-    yield polling_thread
+    return polling_thread
 
 
 @responses.activate

@@ -2,7 +2,7 @@ import pytest
 import responses
 import time
 
-from feathery import set_sdk_key, get, halt
+from feathery import get, halt, set_sdk_key
 from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
 
 
@@ -17,8 +17,7 @@ def feathery_client():
 @pytest.fixture()
 def feathery_client_nodestroy():
     feathery.set_sdk_key(SDK)
-    feathery_client = feathery.get()
-    yield feathery_client
+    return feathery.get()
 
 
 @responses.activate
