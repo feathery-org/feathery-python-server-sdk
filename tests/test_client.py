@@ -5,8 +5,6 @@ import time
 from feathery import set_sdk_key, get, halt
 from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
 
-from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
-
 
 @pytest.fixture()
 def feathery_client():
