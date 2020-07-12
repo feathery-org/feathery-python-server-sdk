@@ -1,10 +1,10 @@
-import time
-
 import pytest
 import responses
-from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
+import time
 
 import feathery
+
+from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
 
 
 @pytest.fixture()
