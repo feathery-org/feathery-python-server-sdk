@@ -1,16 +1,14 @@
 import time
+
 import pytest
 import responses
+from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
+
 import feathery
-from testing_constants import (
-    API_URL,
-    MOCK_ALL_SETTINGS,
-    SDK,
-)
 
 
 @pytest.fixture()
-def test_feathery_client():
+def feathery_client():
     feathery.set_sdk_key(SDK)
     feathery_client = feathery.get()
     yield feathery_client
@@ -18,7 +16,7 @@ def test_feathery_client():
 
 
 @pytest.fixture()
-def test_feathery_client_nodestroy():
+def feathery_client_nodestroy():
     feathery.set_sdk_key(SDK)
     feathery_client = feathery.get()
     yield feathery_client

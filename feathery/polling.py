@@ -14,8 +14,8 @@ class PollingThread(threading.Thread):
         self.cv = threading.Condition(threading.Lock())
 
     def run(self):
-        self.cv.acquire()
         while self._run:
+            self.cv.acquire()
             try:
                 all_data = fetch_and_return_settings(self.sdk_key)
                 self.context_lock.lock()
@@ -25,11 +25,11 @@ class PollingThread(threading.Thread):
             except Exception:
                 pass
             self.cv.wait(self.interval)
-        self.cv.release()
+            self.cv.release()
 
     def stop(self):
         self._run = False
         self.cv.acquire()
-        self.cv.notify(1)
+        self.cv.notify_all()
         self.cv.release()
         self.join()
