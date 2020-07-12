@@ -3,7 +3,7 @@ import responses
 import time
 
 from feathery import get, set_sdk_key
-from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
+from tests.constants import API_URL, MOCK_ALL_SETTINGS, SDK
 
 
 @pytest.fixture()
