@@ -26,41 +26,14 @@ def polling_thread():
     polling_thread = PollingThread(
         context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
     )
-    polling_thread.run()
+    polling_thread.start()
     yield polling_thread
     polling_thread.stop()
 
 
-@pytest.fixture()
-def polling_thread_nodestroy():
-    responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
-    thread_context = {
-        "settings": fetch_and_return_settings(SDK),
-        "is_initialized": False,
-    }
-    lock = ReadWriteLock()
-    polling_thread = PollingThread(
-        context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
-    )
-    polling_thread.start()
-    return polling_thread
-
-
 @responses.activate
-def test_polling_thread_settings():
-    responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
-    thread_context = {
-        "settings": fetch_and_return_settings(SDK),
-        "is_initialized": False,
-    }
-    lock = ReadWriteLock()
-    polling_thread = PollingThread(
-        context=thread_context, sdk_key=SDK, interval=POLL_FREQ_SECONDS, lock=lock,
-    )
-
-    polling_thread.start()
+def test_polling_thread_settings(polling_thread):
     time.sleep(1)
     polling_thread.cv.acquire()
     assert polling_thread.context["settings"] == MOCK_ALL_SETTINGS_PROCESSED
     polling_thread.cv.release()
-    polling_thread.stop()
