@@ -25,9 +25,7 @@ def feathery_client_nodestroy():
 @responses.activate
 def test_uc_get_variant():
     # Set up API
-    responses.add(responses.POST, API_URL, json=MOCK_ALL_SETTINGS, status=202)
     responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
-    responses.add(responses.POST, API_URL, json=MOCK_ALL_SETTINGS, status=202)
 
     feathery.set_sdk_key(SDK)
     feathery_client = feathery.get()
