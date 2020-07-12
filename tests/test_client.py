@@ -2,31 +2,22 @@ import pytest
 import responses
 import time
 
-from feathery import get, halt, set_sdk_key
+from feathery import get, set_sdk_key
 from testing_constants import API_URL, MOCK_ALL_SETTINGS, SDK
 
 
 @pytest.fixture()
 def feathery_client():
-    feathery.set_sdk_key(SDK)
-    feathery_client = feathery.get()
+    set_sdk_key(SDK)
+    feathery_client = get()
     yield feathery_client
     feathery_client.halt()
 
 
-@pytest.fixture()
-def feathery_client_nodestroy():
-    feathery.set_sdk_key(SDK)
-    return feathery.get()
-
-
 @responses.activate
-def test_uc_get_variant():
+def test_uc_get_variant(feathery_client):
     # Set up API
     responses.add(responses.GET, API_URL, json=MOCK_ALL_SETTINGS, status=200)
-
-    feathery.set_sdk_key(SDK)
-    feathery_client = feathery.get()
 
     time.sleep(1)
     # If setting is overriden.
@@ -40,5 +31,3 @@ def test_uc_get_variant():
     # If setting does not exist.
     variant = feathery_client.variation("setting12", 0, "user1")
     assert variant == 0
-
-    feathery_client.halt()
