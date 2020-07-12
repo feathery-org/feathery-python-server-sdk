@@ -5,3 +5,5 @@ env/
 *.pyc
 
 feathery_server_sdk.egg-info
+
+dist/
