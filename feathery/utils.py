@@ -5,7 +5,6 @@ from feathery.constants import API_URL, REQUEST_TIMEOUT
 
 def fetch_and_return_settings(sdk_key: str) -> dict:
     new_settings = get_settings_json(sdk_key)
-
     new_dict = {}
     for item in new_settings:
         name = item["key"]

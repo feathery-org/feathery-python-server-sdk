@@ -1,5 +1,4 @@
 import threading
-import time
 
 from feathery.utils import fetch_and_return_settings
 
@@ -12,6 +11,7 @@ class PollingThread(threading.Thread):
         self.sdk_key = sdk_key
         self.interval = interval
         self.context_lock = lock
+        self.cv = threading.Condition(threading.Lock())
 
     def run(self):
         while self._run:
@@ -23,8 +23,13 @@ class PollingThread(threading.Thread):
                 self.context_lock.unlock()
             except Exception:
                 pass
-            time.sleep(self.interval)
+            self.cv.acquire()
+            self.cv.wait(self.interval)
+            self.cv.release()
 
     def stop(self):
         self._run = False
+        self.cv.acquire()
+        self.cv.notify_all()
+        self.cv.release()
         self.join()
