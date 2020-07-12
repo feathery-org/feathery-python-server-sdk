@@ -11,7 +11,7 @@ def feathery_client():
     set_sdk_key(SDK)
     feathery_client = get()
     yield feathery_client
-    feathery_client.halt()
+    feathery_client.close()
 
 
 @responses.activate
