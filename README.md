@@ -32,10 +32,10 @@ Using `feathery_client`, you can check which variation a particular user should 
 The default value is passed in to ensure that even if an error occurs in our application, some value is returned and can be acted on.
 
 ```py
-dash_color = feathery_client.variation("dash_color", white, "user@test.com")
+dash_color = feathery_client.variation("dash_color", "white", "user@test.com")
 ```
 
-Lastly, when your application is about to terminate, shut down `feathery_client`. This ensures that the client releases any resources it is using, and that any pending analytics events are delivered to Feathery. **This is something you only need to do once**.
+Lastly, shut down `feathery_client` before your application terminates. This ensures that `feathery` releases any resources it is using. **This is something you only need to do once**.
 
 ```py
 # shut down the client, since we're about to quit
