@@ -2,7 +2,7 @@ import setuptools
 
 setuptools.setup(
     name="feathery-server-sdk",
-    version="0.0.2",
+    version="0.0.3",
     author="Markie Wagner, Peter Dun",
     author_email="me@markiewagner.com",
     description="Server-Side Python SDK for Feathery.",
